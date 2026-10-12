@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Welcome</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <main class="card">
+        <img class="logo" src="{{ url_for('static', filename='logo.png') }}" alt="Alexandria National University logo">
+
+        <h1>Welcome, {{ name }}</h1>
+        <p class="subtitle">You are signed in.</p>
+
+        <a class="btn" href="/logout">Logout</a>
+        <a class="btn btn-outline" href="/register">Register another user</a>
+    </main>
+</body>
+</html>

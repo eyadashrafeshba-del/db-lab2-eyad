@@ -1,109 +1,39 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My To-Do List</title>
-    <style>
-        :root { --bg:#fff; --text:#222; --card:#f9f9f9; --border:#ddd; --btn:#4a90e2; --done:#888; }
-        [data-theme="dark"] { --bg:#1e1e2e; --text:#e0e0e0; --card:#2a2a3c; --border:#444; --btn:#667eea; --done:#666; }
-        * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Arial, sans-serif; background: var(--bg); color: var(--text); padding: 30px 20px; max-width: 700px; margin: 0 auto; transition: background 0.3s, color 0.3s; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; padding-bottom: 15px; border-bottom: 1px solid var(--border); }
-        h1 { font-size: 24px; }
-        .hi { font-size: 15px; }
-        .hi strong { color: var(--btn); }
-        .logout { padding: 8px 15px; background: transparent; color: #e74c3c; border: 1px solid #e74c3c; border-radius: 6px; text-decoration: none; font-size: 14px; }
-        .logout:hover { background: #e74c3c; color: white; }
-        .add-form { display: flex; gap: 10px; margin-bottom: 20px; }
-        .add-form input { flex: 1; padding: 10px 14px; border: 1px solid var(--border); border-radius: 6px; background: var(--card); color: var(--text); font-size: 14px; }
-        .add-form button { padding: 10px 20px; background: var(--btn); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 14px; }
-        .add-form button:hover { opacity: 0.9; }
-        .empty { text-align: center; color: #999; padding: 40px 20px; }
-        ul.todo-list { list-style: none; padding: 0; }
-        ul.todo-list li { display: flex; align-items: center; gap: 10px; padding: 12px; background: var(--card); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 10px; }
-        ul.todo-list li.done .title-input { text-decoration: line-through; color: var(--done); }
-        .check { width: 20px; height: 20px; cursor: pointer; }
-        .title-input { flex: 1; padding: 6px 10px; background: transparent; color: var(--text); border: 1px solid transparent; border-radius: 5px; font-size: 14px; }
-        .title-input:focus { border-color: var(--btn); background: var(--bg); outline: none; }
-        .btn-sm { padding: 6px 12px; border: none; border-radius: 5px; cursor: pointer; font-size: 13px; }
-        .btn-save { background: var(--btn); color: white; }
-        .btn-del { background: #e74c3c; color: white; }
-        .theme-toggle { position: fixed; top: 15px; right: 15px; background: var(--btn); color: white; border: none; padding: 8px 14px; border-radius: 20px; cursor: pointer; font-size: 16px; }
-    </style>
-</head>
-<body>
-    <button class="theme-toggle" onclick="toggleTheme()">🌙</button>
+{% extends "base.html" %}
+{% block title %}To-Do{% endblock %}
+{% block card_class %}wide{% endblock %}
+{% block content %}
+<div class="topbar">
+    <h1>To-Do</h1>
+    <div class="who">Hi, {{ name }} <a class="btn btn-small btn-outline" href="/logout">Log out</a></div>
+</div>
 
-    <div class="header">
-        <h1>To-Do</h1>
-        <div>
-            <span class="hi">Hi, <strong>{{ name }}</strong></span>
-            <a href="/logout" class="logout">Log out</a>
-        </div>
-    </div>
+<ul id="errors">{% for e in errors %}<li>{{ e }}</li>{% endfor %}</ul>
 
-    <form class="add-form" method="post" action="/todos/add" onsubmit="return checkAdd(this)">
-        <input type="text" name="title" placeholder="What needs to be done?" maxlength="200">
-        <button type="submit">Add</button>
-    </form>
+<form id="add-form" class="row" method="post" action="/todos/add" novalidate>
+    <input name="title" value="{{ new_title }}" placeholder="What needs to be done?" aria-label="New to-do">
+    <button class="btn btn-small" type="submit">Add</button>
+</form>
 
-    {% if items %}
-        <ul class="todo-list">
-            {% for item in items %}
-                <li class="{% if item.is_done %}done{% endif %}">
-                    <form method="post" action="/todos/toggle/{{ item.todo_id }}">
-                        <input type="checkbox" class="check" onchange="this.form.submit()" {% if item.is_done %}checked{% endif %}>
-                    </form>
-
-                    <form method="post" action="/todos/edit/{{ item.todo_id }}" style="flex:1; display:flex; gap:8px;">
-                        <input type="text" name="title" class="title-input" value="{{ item.title }}" maxlength="200">
-                        <button type="submit" class="btn-sm btn-save">Save</button>
-                    </form>
-
-                    <form method="post" action="/todos/delete/{{ item.todo_id }}" onsubmit="return confirm('Are you sure?');">
-                        <button type="submit" class="btn-sm btn-del">Delete</button>
-                    </form>
-                </li>
-            {% endfor %}
-        </ul>
-    {% else %}
-        <p class="empty">Your list is empty. Add your first to-do! 🚀</p>
-    {% endif %}
-
-    <script>
-        function checkAdd(form) {
-            const t = form.title.value.trim();
-            if (!t) {
-                alert("Title is required");
-                return false;
-            }
-            if (t.length > 200) {
-                alert("Title is too long");
-                return false;
-            }
-            form.title.value = t;
-            return true;
-        }
-
-        (function() {
-            const saved = localStorage.getItem('theme') || 'light';
-            document.documentElement.setAttribute('data-theme', saved);
-            updateBtn(saved);
-        })();
-
-        function toggleTheme() {
-            const cur = document.documentElement.getAttribute('data-theme');
-            const next = cur === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', next);
-            localStorage.setItem('theme', next);
-            updateBtn(next);
-        }
-
-        function updateBtn(theme) {
-            const btn = document.querySelector('.theme-toggle');
-            if (btn) btn.textContent = theme === 'dark' ? '☀️' : '🌙';
-        }
-    </script>
-</body>
-</html>
+{% if todos %}
+<ul class="todos">
+    {% for t in todos %}
+    <li class="todo{% if t.is_done %} done{% endif %}">
+        <form method="post" action="/todos/{{ t.todo_id }}/toggle">
+            <input type="hidden" name="is_done" value="{{ 0 if t.is_done else 1 }}">
+            <button class="check" type="submit"
+                    aria-label="{{ 'Mark as not done' if t.is_done else 'Mark as done' }}">{% if t.is_done %}&#10003;{% endif %}</button>
+        </form>
+        <form class="edit-form row" method="post" action="/todos/{{ t.todo_id }}/edit" novalidate>
+            <input name="title" value="{{ edit_title if edit_id == t.todo_id else t.title }}" aria-label="To-do title">
+            <button class="btn btn-small btn-outline" type="submit">Save</button>
+        </form>
+        <form class="delete-form" method="post" action="/todos/{{ t.todo_id }}/delete">
+            <button class="btn btn-small btn-danger" type="submit">Delete</button>
+        </form>
+    </li>
+    {% endfor %}
+</ul>
+{% else %}
+<p class="empty">Nothing to do yet. Add your first task above.</p>
+{% endif %}
+{% endblock %}
