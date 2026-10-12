@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+</head>
+<body>
+    <h1>Register</h1>
+
+    <ul id="errors">
+        {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+    </ul>
+
+    <form id="register-form" method="post" action="/register">
+        <p><label>Name <input name="name" value="{{ name }}"></label></p>
+        <p><label>Email <input name="email" value="{{ email }}"></label></p>
+        <p><label>Password <input name="password" type="password"></label></p>
+        <p><label>Confirm password <input name="confirm_password" type="password"></label></p>
+        <button type="submit">Register</button>
+    </form>
+
+    <p>Already registered? <a href="/login">Login</a></p>
+
+    <script src="/static/validate.js"></script>
+</body>
+</html>
