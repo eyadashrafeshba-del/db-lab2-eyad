@@ -3,9 +3,8 @@
 ## 1. Team
 | Name | ID | Who did what |
 |---|---|---|
-| Eyad ... | ... | Everything (database, back end, front end, README) |
-
-> Fill in the real names, IDs and the split of work (a partner needs commits too).
+| Eyad Eshba | 2304113 | startup (database, back end, README) |
+| EzzEldeen Gamal | 2304043 | Save and delete and edit and frontend |
 
 ## 2. Technology
 - **Back end:** Python 3.12, Flask, PyMySQL (plain SQL, no ORM), bcrypt, python-dotenv
